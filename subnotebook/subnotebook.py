@@ -1,4 +1,3 @@
-from IPython.display import clear_output
 import asyncio
 import nbformat
 from nbclient import NotebookClient
@@ -76,15 +75,14 @@ class SubNotebook:
         kwargs.update(self.kwargs)
 
         # pass parameters to subnotebook
-        # we glue the parameter values in this cell (caller notebook)
-        # and catch the output so that we can put it in the first cell of the subnotebook
-        # then we clear the output of this cell
+        # we glue the parameter values and put the output data
+        # in the first cell of the subnotebook
         outputs = []
         for k, v in kwargs.items():
-            data, metadata = scrapbook.glue(k, v)
+            data, metadata = scrapbook.glue(k, v, return_output=True)
             outputs.append({'data': data, 'metadata': metadata, 'output_type': 'display_data'})
         for k, v in self.kwargs_display.items():
-            data, metadata = scrapbook.glue(k, v, 'display')
+            data, metadata = scrapbook.glue(k, v, 'display', return_output=True)
             for k2, v2 in data.items():
                 if isinstance(v2, bytes):
                     data[k2] = b2a_base64(v2).decode('ascii').replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"').replace("'", "\\'")
@@ -117,7 +115,6 @@ class SubNotebook:
         self._init_params(**kwargs)
         NotebookClient(nb=self.nb, nest_asyncio=True).execute()
         results = self.get_results()
-        clear_output()
         return results
 
     def run_async(self, **kwargs):
