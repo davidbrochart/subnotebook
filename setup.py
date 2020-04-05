@@ -8,10 +8,7 @@ setup(
     author_email='david.brochart@gmail.com',
     packages=['subnotebook'],
     install_requires = [
-        'nbformat>=5',
-        'nbclient>=0.2.0',
-        'nteract-scrapbook @ git+https://github.com/davidbrochart/scrapbook@return_data#egg=nteract-scrapbook',
-        'nest_asyncio'
+        'nbformat>=5'
     ],
     python_requires = '>=3.6',
 )
