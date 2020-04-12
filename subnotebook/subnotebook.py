@@ -1,5 +1,13 @@
 import nbformat
 import inspect
+#import voila.app
+#import nest_asyncio
+import subprocess
+from IPython.display import IFrame, display
+import atexit
+
+
+voila_processes = []
 
 
 def open_nb(path):
@@ -52,3 +60,38 @@ class SubNotebook:
         if len(results) == 1:
             return results[0]
         return tuple(results)
+
+
+def get_lines(std_pipe):
+    '''Generator that yields lines from a standard pipe as there are printed.'''
+    for line in iter(std_pipe.readline, ''):
+        yield line
+    std_pipe.close()
+
+
+def display_nb(path, server_address='http://*:*/', width='100%', height=1000):
+    #nest_asyncio.apply()
+    #voila_app = voila.app.Voila()
+    #voila_app.initialize([path, '--no-browser', "--Voila.tornado_settings={'headers':{'Content-Security-Policy':\"frame-ancestors 'self' " + server_address + "\"}}"])
+    #voila_app.start()
+    #print(voila_app.server_url)
+
+    cmd = ['voila', '--no-browser', "--Voila.tornado_settings={'headers':{'Content-Security-Policy':\"frame-ancestors 'self' " + server_address + "\"}}", path]
+    voila = subprocess.Popen(cmd, stderr=subprocess.PIPE, universal_newlines=True)
+    voila_processes.append(voila)
+
+    # wait until server is ready and get the address
+    for line in get_lines(voila.stderr):
+        if line.startswith('http://'):
+            voila_address = line.strip()
+            break
+
+    display(IFrame(src=voila_address, width=width, height=height))
+
+
+def kill_processes(processes):
+    for p in processes:
+        p.kill()
+
+
+atexit.register(kill_processes, voila_processes)
