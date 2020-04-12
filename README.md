@@ -1,10 +1,12 @@
 # Subnotebook
 
-Run a notebook as you would call a Python function, pass parameters and get
-results back, including widgets.
+Run a notebook as you would call a Python function.
 
-Say you have a main notebook `main_notebook.ipynb`:
+Two modes are currently supported:
 
+- An in-process mode, where the subnotebook is executed in the same kernel your
+interpreter is running in (but in a different name space). This allows to pass
+parameters and get results back, including widgets.
 ```python
 from subnotebook import open_nb
 
@@ -13,39 +15,15 @@ nb = open_nb('sub_notebook.ipynb')
 
 # execute your notebook, pass parameters, get back results
 ab, ba, slider, output = nb.run(a='c', b='d')
-
-# you can manipulate the subnotebook's returned values
-print(ab, ba)
-
-# show the slider widget
-slider
-
-# the output of this cell will print the slider's value
-output
 ```
 
-And a subnotebook `sub_notebook.ipynb`:
-
+- An out-of-process mode, where the subnotebook is executed and served using
+[Voila](https://voila.readthedocs.io), and included in the main notebook as an
+IFrame. This mode only allows to display the outputs of the subnotebook, which
+is useful for offloading the main notebook but also to offer a UI to resources
+you would not have access to, such as big data or protected data.
 ```python
-import ipywidgets
-from subnotebook import default_value, Return
+from subnotebook import display_nb
 
-# give default values to the input arguments
-default_value(a='a', b='b')
-
-# here we create a slider widget, observe its value
-# and print it in an output widget
-slider = ipywidgets.IntSlider()
-output = ipywidgets.Output()
-def on_value_change(change):
-    with output:
-        print(change['new'])
-slider.observe(on_value_change, names='value')
-
-# you can also return values which depend on the input arguments
-ab = a + b
-ba = b + a
-
-# return the results of the subnotebook
-Return(ab, ba, slider, output)
+display_nb('widget_notebook.ipynb')
 ```
