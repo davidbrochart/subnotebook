@@ -10,6 +10,12 @@ import atexit
 voila_processes = []
 
 
+def run_nb(path, **kwargs):
+    nb = open_nb(path)
+    results = nb.run(**kwargs)
+    return results
+
+
 def open_nb(path):
     nb = nbformat.read(path, nbformat.NO_CONVERT)
     subnb = SubNotebook(nb)
@@ -63,7 +69,7 @@ class SubNotebook:
 
 
 def get_lines(std_pipe):
-    '''Generator that yields lines from a standard pipe as there are printed.'''
+    '''Generator that yields lines from a standard pipe as they are printed.'''
     for line in iter(std_pipe.readline, ''):
         yield line
     std_pipe.close()

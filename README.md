@@ -8,13 +8,9 @@ Two modes are currently supported:
 interpreter is running in (but in a different name space). This allows to pass
 parameters and get results back, including widgets.
 ```python
-from subnotebook import open_nb
+from subnotebook import run_nb
 
-# open your notebook
-nb = open_nb('sub_notebook.ipynb')
-
-# execute your notebook, pass parameters, get back results
-ab, ba, slider, output = nb.run(a='c', b='d')
+ab, ba, slider, output = run_nb('sub_notebook.ipynb', a='c', b='d')
 ```
 
 - An out-of-process mode, where the subnotebook is executed and served using
